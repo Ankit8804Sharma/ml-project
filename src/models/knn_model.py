@@ -8,7 +8,7 @@ def run_knn():
 
     print("\n===== KNN =====")
 
-    # 1️⃣ Load data
+    #  Load data
     df = pd.read_csv("Data/labeled_data.csv")
 
     features = [
@@ -22,7 +22,7 @@ def run_knn():
     X = df[features]
     y = df["label"]
 
-    # 2️⃣ Train-test split (with stratification)
+    #  Train-test split (with stratification)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -30,19 +30,19 @@ def run_knn():
         stratify=y
     )
 
-    # 3️⃣ Scaling (MANDATORY for KNN)
+    #  Scaling (MANDATORY for KNN)
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    # 4️⃣ Model (slightly tuned)
-    model = KNeighborsClassifier(n_neighbors=7)  # 🔥 try 7 instead of 5
+    #  Model (slightly tuned)
+    model = KNeighborsClassifier(n_neighbors=7) 
     model.fit(X_train, y_train)
 
-    # 5️⃣ Predictions
+    # Predictions
     preds = model.predict(X_test)
 
-    # 6️⃣ Evaluation
+    # Evaluation
     print(classification_report(y_test, preds))
     print("Accuracy:", round(accuracy_score(y_test, preds), 4))
 
