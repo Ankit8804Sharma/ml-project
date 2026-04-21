@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
 import joblib
 import os
 
@@ -48,9 +50,17 @@ def run_decision_tree():
     # Save model
     os.makedirs("Models", exist_ok=True)
     joblib.dump(dt, "Models/decision_tree.pkl")
+    plt.figure(figsize=(20, 10))
+    plot_tree(dt, max_depth=3, feature_names=features,
+              class_names=['Normal', 'Fraud'], filled=True)
+    plt.savefig("Models/decision_tree_plot.png")
+    plt.show()
+    
+    print("Model + plot saved.")
     print("Decision Tree model saved to Models/decision_tree.pkl")
     
     return dt
+
 
 if __name__ == "__main__":
     run_decision_tree()
