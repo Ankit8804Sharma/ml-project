@@ -21,9 +21,9 @@ def run_decision_tree():
 
     # Derived features: value_ratio compares transaction value to execution cost
     # is_high_value flags transactions above the dataset average
-    df["value_ratio"] = df["Value"] / (df["GasCost"] + 1)
+    df["value_ratio"] = df["value"] / (df["GasCost"] + 1)
     df["gas_efficiency"] = df["GasEfficiency"]
-    df["is_high_value"] = (df["Value"] > df["Value"].mean()).astype(int)
+    df["is_high_value"] = (df["value"] > df["value"].mean()).astype(int)
 
     # Same 13 features as every other model so results are directly comparable
     # IF_Score, StatScore, TempScore are anomaly signals from MF-UFS
@@ -37,8 +37,6 @@ def run_decision_tree():
         "value_ratio",
         "gas_efficiency",
         "is_high_value",
-        "from_scam",
-        "to_scam",
     ]
 
     X = df[features].fillna(0)
