@@ -12,15 +12,11 @@ def plot_roc_curve(df):
 
     print("\n===== ROC CURVE =====\n")
 
-    X = df.drop([
-    "label",
-    "FraudFlag",
-    "FinalScore",
-    "anomaly_label",
-    "IF_Score"
-    ], axis=1)
+    X = df.drop(
+        ["label", "FraudFlag", "FinalScore", "anomaly_label", "IF_Score"], axis=1
+    )
 
-    X = X.select_dtypes(include=['number'])
+    X = X.select_dtypes(include=["number"])
     y = df["label"]
 
     # Train-test split
@@ -32,7 +28,7 @@ def plot_roc_curve(df):
 
     print("y_train distribution:\n", y_train.value_counts())
     print("y_test distribution:\n", y_test.value_counts())
-        # Scaling
+    # Scaling
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
@@ -51,7 +47,7 @@ def plot_roc_curve(df):
     # Plot ROC
     plt.figure()
     plt.plot(fpr, tpr, label=f"AUC = {roc_auc:.2f}")
-    plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.plot([0, 1], [0, 1], linestyle="--")
 
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
@@ -84,7 +80,7 @@ def run_eda():
     print(df["label"].value_counts())
 
     plt.figure()
-    df["label"].value_counts().plot(kind='bar')
+    df["label"].value_counts().plot(kind="bar")
     plt.title("Class Distribution (Fraud vs Normal)")
     plt.xlabel("Class")
     plt.ylabel("Count")
@@ -123,7 +119,7 @@ def run_eda():
     plt.show()
 
     # Correlation Heatmap
-    numeric_df = df.select_dtypes(include=['number'])
+    numeric_df = df.select_dtypes(include=["number"])
     plt.figure(figsize=(10, 8))
     sns.heatmap(numeric_df.corr(), cmap="coolwarm")
     plt.title("Feature Correlation Heatmap")

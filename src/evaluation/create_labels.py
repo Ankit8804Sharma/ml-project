@@ -25,7 +25,7 @@ keep_cols = [
     "FraudFlag",
     "from_scam",
     "to_scam",
-    "label"
+    "label",
 ]
 
 df = df[keep_cols]

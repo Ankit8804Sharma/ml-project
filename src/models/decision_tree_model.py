@@ -3,6 +3,7 @@ import os
 import joblib
 import pandas as pd
 import matplotlib
+
 matplotlib.use("Agg")  # non-interactive backend, works in headless/server environments
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, plot_tree
@@ -20,17 +21,24 @@ def run_decision_tree():
 
     # Derived features: value_ratio compares transaction value to execution cost
     # is_high_value flags transactions above the dataset average
-    df["value_ratio"]    = df["Value"] / (df["GasCost"] + 1)
+    df["value_ratio"] = df["Value"] / (df["GasCost"] + 1)
     df["gas_efficiency"] = df["GasEfficiency"]
-    df["is_high_value"]  = (df["Value"] > df["Value"].mean()).astype(int)
+    df["is_high_value"] = (df["Value"] > df["Value"].mean()).astype(int)
 
     # Same 13 features as every other model so results are directly comparable
     # IF_Score, StatScore, TempScore are anomaly signals from MF-UFS
     # from_scam and to_scam are direct fraud signals from the original dataset
     features = [
-        "Value_z", "GasCost_z", "GasEfficiency_z", "TimeGap_z", "BlockGap_z",
-        "value_ratio", "gas_efficiency", "is_high_value",
-        "from_scam", "to_scam"
+        "Value_z",
+        "GasCost_z",
+        "GasEfficiency_z",
+        "TimeGap_z",
+        "BlockGap_z",
+        "value_ratio",
+        "gas_efficiency",
+        "is_high_value",
+        "from_scam",
+        "to_scam",
     ]
 
     X = df[features].fillna(0)
@@ -45,7 +53,7 @@ def run_decision_tree():
     # Decision Trees don't need scaling but we keep it consistent for fair comparison
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_test  = scaler.transform(X_test)
+    X_test = scaler.transform(X_test)
 
     # SMOTE after scaling so synthetic fraud samples are created in normalized space
     smote = SMOTE(random_state=42)
@@ -57,12 +65,9 @@ def run_decision_tree():
     # No class_weight here because SMOTE already balanced the training set to 50/50
     # Using class_weight=balanced after SMOTE double-penalizes and hurts precision
     model = DecisionTreeClassifier(
-        max_depth=8,
-        min_samples_split=10,
-        min_samples_leaf=5,
-        random_state=42
+        max_depth=8, min_samples_split=10, min_samples_leaf=5, random_state=42
     )
-    
+
     model.fit(X_train, y_train)
 
     preds = model.predict(X_test)
@@ -74,7 +79,9 @@ def run_decision_tree():
 
     # Feature importances show which signals the tree relied on most
     print("\nFeature Importances:")
-    for feat, imp in sorted(zip(features, model.feature_importances_), key=lambda x: x[1], reverse=True):
+    for feat, imp in sorted(
+        zip(features, model.feature_importances_), key=lambda x: x[1], reverse=True
+    ):
         print(f"  {feat}: {imp:.4f}")
 
     # Save trained model so app.py can load it for the Streamlit demo
@@ -84,7 +91,13 @@ def run_decision_tree():
     # Save top 3 levels of the tree as PNG — deep enough to show logic, readable enough to interpret
     # plt.show() removed — it blocks execution in server and headless environments
     plt.figure(figsize=(20, 10))
-    plot_tree(model, max_depth=3, feature_names=features, class_names=["Normal", "Fraud"], filled=True)
+    plot_tree(
+        model,
+        max_depth=3,
+        feature_names=features,
+        class_names=["Normal", "Fraud"],
+        filled=True,
+    )
     plt.tight_layout()
     plt.savefig("Models/decision_tree_plot.png", dpi=150)
     plt.close()

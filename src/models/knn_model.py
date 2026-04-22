@@ -14,16 +14,23 @@ def run_knn():
     # Derived features computed here because they are model-specific
     # value_ratio captures transaction value relative to its execution cost
     # is_high_value flags transactions above the dataset average
-    df["value_ratio"]    = df["Value"] / (df["GasCost"] + 1)
+    df["value_ratio"] = df["Value"] / (df["GasCost"] + 1)
     df["gas_efficiency"] = df["GasEfficiency"]
-    df["is_high_value"]  = (df["Value"] > df["Value"].mean()).astype(int)
+    df["is_high_value"] = (df["Value"] > df["Value"].mean()).astype(int)
 
     # Scaling is mandatory for KNN — at prediction time it measures Euclidean distance
     # from each new point to every training point, so unscaled features break it entirely
     features = [
-        "Value_z", "GasCost_z", "GasEfficiency_z", "TimeGap_z", "BlockGap_z",
-        "value_ratio", "gas_efficiency", "is_high_value",
-        "from_scam", "to_scam"
+        "Value_z",
+        "GasCost_z",
+        "GasEfficiency_z",
+        "TimeGap_z",
+        "BlockGap_z",
+        "value_ratio",
+        "gas_efficiency",
+        "is_high_value",
+        "from_scam",
+        "to_scam",
     ]
 
     X = df[features].fillna(0)
@@ -38,7 +45,7 @@ def run_knn():
     # synthetic points, so if data is unscaled, SMOTE's neighbour search is also broken
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_test  = scaler.transform(X_test)
+    X_test = scaler.transform(X_test)
 
     # SMOTE after scaling so synthetic fraud samples are created in normalized space
     smote = SMOTE(random_state=42)

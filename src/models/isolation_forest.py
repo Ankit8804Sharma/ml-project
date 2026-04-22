@@ -3,13 +3,7 @@ from sklearn.ensemble import IsolationForest
 
 df = pd.read_csv("Data/processed_data.csv")
 
-features = [
-    "Value_z",
-    "GasCost_z",
-    "GasEfficiency_z",
-    "TimeGap_z",
-    "BlockGap_z"
-]
+features = ["Value_z", "GasCost_z", "GasEfficiency_z", "TimeGap_z", "BlockGap_z"]
 
 X = df[features]
 

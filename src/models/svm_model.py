@@ -14,9 +14,9 @@ def run_svm():
     # Derived features computed here because they are model-specific
     # value_ratio captures transaction value relative to its execution cost
     # is_high_value flags transactions above the dataset average
-    df["value_ratio"]    = df["Value"] / (df["GasCost"] + 1)
+    df["value_ratio"] = df["Value"] / (df["GasCost"] + 1)
     df["gas_efficiency"] = df["GasEfficiency"]
-    df["is_high_value"]  = (df["Value"] > df["Value"].mean()).astype(int)
+    df["is_high_value"] = (df["Value"] > df["Value"].mean()).astype(int)
 
     # Z-scored base features are mandatory for SVM
     # RBF kernel computes distances in feature space, so unscaled features
@@ -25,9 +25,16 @@ def run_svm():
     # Those three scores directly compute FinalScore which creates the label
     # The supervised model must learn from raw features independently
     features = [
-        "Value_z", "GasCost_z", "GasEfficiency_z", "TimeGap_z", "BlockGap_z",
-        "value_ratio", "gas_efficiency", "is_high_value",
-        "from_scam", "to_scam"
+        "Value_z",
+        "GasCost_z",
+        "GasEfficiency_z",
+        "TimeGap_z",
+        "BlockGap_z",
+        "value_ratio",
+        "gas_efficiency",
+        "is_high_value",
+        "from_scam",
+        "to_scam",
     ]
 
     X = df[features].fillna(0)
@@ -43,7 +50,7 @@ def run_svm():
     # where Value dominates distances and all other features are effectively ignored
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_test  = scaler.transform(X_test)
+    X_test = scaler.transform(X_test)
 
     # SMOTE after scaling so all 13 features contribute equally to interpolation
     smote = SMOTE(random_state=42)
