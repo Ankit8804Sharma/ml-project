@@ -1,56 +1,93 @@
 import subprocess
 import sys
+import os
+import time
 
 print("\n===== STARTING FULL PIPELINE =====\n")
 
-# We run each pipeline step as a subprocess instead of a bare import
-# With bare imports, Python caches the module after the first run
-# so if any step crashes and you re-run main.py, that step silently does nothing
-# subprocess.run forces every step to execute fresh every time
-# check=True means the pipeline stops immediately if any step fails with a clear error message
+start_time = time.time()
 
-print("1. Running Feature Engineering...")
-subprocess.run([sys.executable, "src/preprocessing/feature_engineering.py"], check=True)
 
-# Isolation Forest scores each transaction for anomalousness — contamination=0.15
-# because our dataset has roughly 15% fraud transactions
-print("2. Running Isolation Forest...")
-subprocess.run([sys.executable, "src/models/isolation_forest.py"], check=True)
+def run_step(name, command):
+    print(f"\n>>> {name}...")
+    t0 = time.time()
+    subprocess.run([sys.executable, command], check=True)
+    print(f"✓ {name} completed in {time.time() - t0:.2f}s")
 
-# MF-UFS combines IF_Score + StatScore + TempScore into FinalScore
-# and sets FraudFlag=1 for transactions in the top 15% of FinalScore
-print("3. Running MF-UFS Algorithm...")
-subprocess.run([sys.executable, "src/models/mfufs.py"], check=True)
 
-# create_labels reads final_output.csv, drops raw blockchain columns,
-# and writes labeled_data.csv which all supervised models below read from
-print("4. Creating Labels...")
-subprocess.run([sys.executable, "src/evaluation/create_labels.py"], check=True)
+# -----------------------------
+# STEP 1: FEATURE ENGINEERING
+# -----------------------------
+run_step(
+    "Running Feature Engineering",
+    "src/preprocessing/feature_engineering.py"
+)
 
-# All five supervised models below read from labeled_data.csv
-# They use only raw transaction features — not the MF-UFS scores —
-# so they learn independently from the unsupervised labeler
+# -----------------------------
+# STEP 2: ISOLATION FOREST
+# -----------------------------
+run_step(
+    "Running Isolation Forest",
+    "src/models/isolation_forest.py"
+)
+
+# -----------------------------
+# STEP 3: MF-UFS
+# -----------------------------
+run_step(
+    "Running MF-UFS Algorithm",
+    "src/models/mfufs.py"
+)
+
+# -----------------------------
+# STEP 4: CREATE LABELS
+# -----------------------------
+run_step(
+    "Creating Labels",
+    "src/evaluation/create_labels.py"
+)
+
+# -----------------------------
+# VERIFY DATA EXISTS
+# -----------------------------
+if not os.path.exists("Data/new dataset/labeled_data.csv"):
+    raise FileNotFoundError("❌ labeled_data.csv not found!")
+
+print("\n Dataset ready for model training\n")
+
+# -----------------------------
+# IMPORT MODELS
+# -----------------------------
 from src.models.logistic_model import run_logistic
 from src.models.svm_model import run_svm
 from src.models.knn_model import run_knn
 from src.models.decision_tree_model import run_decision_tree
 from src.models.random_forest import run_random_forest
 
-print("5. Running Logistic Regression...")
+# -----------------------------
+# STEP 5–9: MODELS
+# -----------------------------
+print("\n===== TRAINING MODELS =====\n")
+
+print("5. Logistic Regression")
 run_logistic()
 
-print("6. Running SVM...")
+print("\n6. SVM")
 run_svm()
 
-print("7. Running KNN...")
+print("\n7. KNN")
 run_knn()
 
-print("8. Running Decision Tree...")
+print("\n8. Decision Tree")
 run_decision_tree()
 
-# Random Forest is a Bagging ensemble — 200 decision trees trained on bootstrap samples
-# Added to cover Unit III ensemble methods in CS1138 syllabus
-print("9. Running Random Forest...")
+print("\n9. Random Forest")
 run_random_forest()
 
-print("\n===== PIPELINE COMPLETED SUCCESSFULLY =====\n")
+# -----------------------------
+# DONE
+# -----------------------------
+total_time = time.time() - start_time
+
+print("\n===== PIPELINE COMPLETED SUCCESSFULLY =====")
+print(f" Total execution time: {total_time:.2f} seconds\n")
