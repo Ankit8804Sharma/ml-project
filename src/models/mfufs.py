@@ -3,6 +3,7 @@ import numpy as np
 
 df = pd.read_csv("Data/new dataset/if_scored.csv")
 
+
 # -----------------------------
 # StatScore
 # -----------------------------
@@ -38,7 +39,7 @@ df["FinalScore"] = (
     + 0.3 * df["TempScore"]
 )
 
-# Threshold (top 15% anomalies)
+# Threshold (top 15%)
 threshold = df["FinalScore"].quantile(0.85)
 df["FraudFlag"] = (df["FinalScore"] > threshold).astype(int)
 
