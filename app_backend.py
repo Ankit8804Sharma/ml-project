@@ -5,21 +5,21 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-# -----------------------------
+
 # LOAD MODELS
-# -----------------------------
+
 rf = joblib.load("Models/random_forest.pkl")
 dt = joblib.load("Models/decision_tree.pkl")
 lr = joblib.load("Models/logistic.pkl")
 
-# -----------------------------
+
 # LOAD SCALERS
-# -----------------------------
+
 lr_scaler  = joblib.load("Models/logistic_scaler.pkl")
 
-# -----------------------------
+
 # DATASET STATS
-# -----------------------------
+
 STATS = {
     "Value": (0.1823, 2.8741),
     "GasCost": (0.00412, 0.00831),
@@ -31,17 +31,17 @@ STATS = {
 def z(x, mean, std):
     return (x - mean) / (std + 1e-9)
 
-# -----------------------------
+
 # PREDICT API
-# -----------------------------
+
 @app.route("/predict", methods=["POST"])
 def predict():
     print("POST REQUEST HIT")
     data = request.json
 
-    # -----------------------------
+    
     # FEATURE ENGINEERING
-    # -----------------------------
+    
     Value = data["val_in"] + data["val_out"]
     GasCost = data["fee"]
     GasEfficiency = data["gas_used"] / (data["gas"] + 1e-9)
@@ -54,23 +54,23 @@ def predict():
 
     X = np.array([[Value_z, GasCost_z, GasEfficiency_z, TimeGap_z, BlockGap_z]])
 
-    # -----------------------------
+    
     # SCALE FOR MODELS
-    # -----------------------------
+    
     X_scaled_lr  = lr_scaler.transform(X)
 
-    # -----------------------------
+    
     # MODEL PREDICTIONS
-    # -----------------------------
+    
     results = {
         "Decision Tree": float(dt.predict_proba(X)[0][1]),
         "Random Forest": float(rf.predict_proba(X)[0][1]),
         "Logistic": float(lr.predict_proba(X_scaled_lr)[0][1]),
     }
 
-    # -----------------------------
+    
     # EXTRA DATA FOR UI
-    # -----------------------------
+    
     zscores = {
         "Value": float(Value_z),
         "GasCost": float(GasCost_z),
@@ -95,9 +95,9 @@ def predict():
         "GasEfficiency": float(GasEfficiency),
     }
 
-    # -----------------------------
+    
     # RESPONSE
-    # -----------------------------
+    
     return jsonify({
         "modelProbs": results,
         "FinalScore": float(np.mean(list(results.values()))),

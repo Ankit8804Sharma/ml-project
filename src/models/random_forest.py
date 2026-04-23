@@ -16,14 +16,14 @@ def run_random_forest():
 
     print("\n===== RANDOM FOREST (Final Clean Version) =====")
 
-    # -----------------------------
+
     # LOAD DATA
-    # -----------------------------
+
     df = pd.read_csv("Data/new dataset/labeled_data.csv")
 
-    # -----------------------------
+
     # FEATURES (NO LEAKAGE)
-    # -----------------------------
+
     features = [
         "Value_z",
         "GasCost_z",
@@ -35,9 +35,9 @@ def run_random_forest():
     X = df[features].fillna(0)
     y = df["FraudFlag"]
 
-    # -----------------------------
+
     # TRAIN-TEST SPLIT
-    # -----------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -45,15 +45,15 @@ def run_random_forest():
         stratify=y
     )
 
-    # -----------------------------
+
     # SMOTE (NO SCALING NEEDED)
-    # -----------------------------
+
     smote = SMOTE(sampling_strategy=0.5, random_state=42)
     X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    # -----------------------------
+
     # MODEL (STRONG CONFIG)
-    # -----------------------------
+
     model = RandomForestClassifier(
         n_estimators=300,
         max_depth=12,
@@ -67,9 +67,9 @@ def run_random_forest():
 
     preds = model.predict(X_test)
 
-    # -----------------------------
+
     # REPORT
-    # -----------------------------
+
     print("\n Accuracy:", accuracy_score(y_test, preds))
     print("\n Precision:", precision_score(y_test, preds))
     print(" Recall   :", recall_score(y_test, preds))
@@ -81,9 +81,9 @@ def run_random_forest():
     print("\n Classification Report:")
     print(classification_report(y_test, preds))
 
-    # -----------------------------
+
     # FEATURE IMPORTANCE
-    # -----------------------------
+
     print("\nFeature Importances:")
     for feat, imp in sorted(
         zip(features, model.feature_importances_),
@@ -92,9 +92,9 @@ def run_random_forest():
     ):
         print(f"  {feat}: {imp:.4f}")
 
-    # -----------------------------
+
     # SAVE MODEL
-    # -----------------------------
+
     os.makedirs("Models", exist_ok=True)
     joblib.dump(model, "Models/random_forest.pkl")
 

@@ -4,9 +4,9 @@ import numpy as np
 df = pd.read_csv("Data/new dataset/Dataset.csv")
 df.columns = df.columns.str.strip()
 
-# -----------------------------
+
 # FEATURE ENGINEERING
-# -----------------------------
+
 
 df["Value"] = df["value"]
 df["GasCost"] = df["gas"] * df["gas_price"]
@@ -22,18 +22,18 @@ df["TimeGap"] = df["block_timestamp"].diff().dt.total_seconds().fillna(0)
 df["block_number"] = pd.to_numeric(df["block_number"], errors="coerce")
 df["BlockGap"] = df["block_number"].diff().fillna(0)
 
-# -----------------------------
+
 # Z-SCORE NORMALIZATION
-# -----------------------------
+
 
 features = ["Value", "GasCost", "GasEfficiency", "TimeGap", "BlockGap"]
 
 for col in features:
     df[col + "_z"] = (df[col] - df[col].mean()) / (df[col].std() + epsilon)
 
-# -----------------------------
+
 # FINAL CLEAN DATASET
-# -----------------------------
+
 
 final_df = df[[
     "Value_z",

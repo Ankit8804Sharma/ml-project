@@ -20,14 +20,14 @@ def run_decision_tree():
 
     print("\n===== DECISION TREE (Clean Version) =====")
 
-    # -----------------------------
+
     # LOAD DATA
-    # -----------------------------
+
     df = pd.read_csv("Data/new dataset/labeled_data.csv")
 
-    # -----------------------------
-    # FEATURES (NO LEAKAGE)
-    # -----------------------------
+
+    # FEATURES
+
     features = [
         "Value_z",
         "GasCost_z",
@@ -39,9 +39,9 @@ def run_decision_tree():
     X = df[features].fillna(0)
     y = df["FraudFlag"]
 
-    # -----------------------------
+
     # TRAIN-TEST SPLIT
-    # -----------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -49,15 +49,15 @@ def run_decision_tree():
         stratify=y
     )
 
-    # -----------------------------
+
     # SMOTE (NO SCALING NEEDED)
-    # -----------------------------
+
     smote = SMOTE(sampling_strategy=0.5, random_state=42)
     X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    # -----------------------------
+
     # MODEL
-    # -----------------------------
+
     model = DecisionTreeClassifier(
         max_depth=8,
         min_samples_split=10,
@@ -69,9 +69,9 @@ def run_decision_tree():
 
     preds = model.predict(X_test)
 
-    # -----------------------------
+
     # REPORT
-    # -----------------------------
+
     print("\n Accuracy:", accuracy_score(y_test, preds))
     print("\n Precision:", precision_score(y_test, preds))
     print(" Recall   :", recall_score(y_test, preds))
@@ -83,9 +83,9 @@ def run_decision_tree():
     print("\n Classification Report:")
     print(classification_report(y_test, preds))
 
-    # -----------------------------
+
     # FEATURE IMPORTANCE
-    # -----------------------------
+
     print("\nFeature Importances:")
     for feat, imp in sorted(
         zip(features, model.feature_importances_),
@@ -94,15 +94,15 @@ def run_decision_tree():
     ):
         print(f"  {feat}: {imp:.4f}")
 
-    # -----------------------------
+
     # SAVE MODEL
-    # -----------------------------
+
     os.makedirs("Models", exist_ok=True)
     joblib.dump(model, "Models/decision_tree.pkl")
 
-    # -----------------------------
+
     # TREE VISUALIZATION
-    # -----------------------------
+
     plt.figure(figsize=(20, 10))
     plot_tree(
         model,

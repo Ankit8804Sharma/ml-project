@@ -17,14 +17,14 @@ def run_svm():
 
     print("\n===== SVM (Final Version) =====")
 
-    # -----------------------------
+
     # LOAD DATA
-    # -----------------------------
+
     df = pd.read_csv("Data/new dataset/labeled_data.csv")
 
-    # -----------------------------
+
     # FEATURES (NO LEAKAGE)
-    # -----------------------------
+
     features = [
         "Value_z",
         "GasCost_z",
@@ -36,9 +36,9 @@ def run_svm():
     X = df[features].fillna(0)
     y = df["FraudFlag"]
 
-    # -----------------------------
+
     # TRAIN-TEST SPLIT
-    # -----------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -46,22 +46,22 @@ def run_svm():
         stratify=y
     )
 
-    # -----------------------------
+
     # SCALING
-    # -----------------------------
+
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    # -----------------------------
+
     # SMOTE (balanced but not overfit)
-    # -----------------------------
+
     smote = SMOTE(sampling_strategy=0.5, random_state=42)
     X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    # -----------------------------
+
     # MODEL (TUNED SLIGHTLY)
-    # -----------------------------
+
     model = SVC(
         C=2,              
         kernel="rbf",
@@ -72,15 +72,15 @@ def run_svm():
 
     model.fit(X_train, y_train)
 
-    # -----------------------------
+
     # PREDICTION (WITH THRESHOLD)
-    # -----------------------------
+
     probs = model.predict_proba(X_test)[:, 1]
     preds = (probs > 0.45).astype(int)
 
-    # -----------------------------
+
     # REPORT
-    # -----------------------------
+
     print("\n Accuracy:", accuracy_score(y_test, preds))
     print("\n Precision:", precision_score(y_test, preds))
     print(" Recall   :", recall_score(y_test, preds))
@@ -92,9 +92,9 @@ def run_svm():
     print("\n Classification Report:")
     print(classification_report(y_test, preds))
 
-    # -----------------------------
+
     # SAVE MODEL + SCALER
-    # -----------------------------
+
     os.makedirs("Models", exist_ok=True)
     joblib.dump(model, "Models/svm.pkl")
     joblib.dump(scaler, "Models/svm_scaler.pkl")

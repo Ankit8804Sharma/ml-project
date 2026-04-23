@@ -32,9 +32,9 @@ def run_knn():
     X = df[features].fillna(0)
     y = df["FraudFlag"]
 
-    # -----------------------------
+
     # TRAIN-TEST SPLIT
-    # -----------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -42,22 +42,22 @@ def run_knn():
         stratify=y
     )
 
-    # -----------------------------
+
     # SCALING (MANDATORY FOR KNN)
-    # -----------------------------
+
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    # -----------------------------
+
     # SMOTE (IMPORTANT)
-    # -----------------------------
+
     smote = SMOTE(sampling_strategy=0.5, random_state=42)
     X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    # -----------------------------
+
     # MODEL
-    # -----------------------------
+
     model = KNeighborsClassifier(
         n_neighbors=5,
         weights="distance"
@@ -67,9 +67,9 @@ def run_knn():
 
     preds = model.predict(X_test)
 
-    # -----------------------------
+
     # REPORT
-    # -----------------------------
+
     print("\n Accuracy:", accuracy_score(y_test, preds))
     print("\n Precision:", precision_score(y_test, preds))
     print(" Recall   :", recall_score(y_test, preds))
@@ -81,9 +81,9 @@ def run_knn():
     print("\n Classification Report:")
     print(classification_report(y_test, preds))
 
-    # -----------------------------
+
     # SAVE MODEL + SCALER
-    # -----------------------------
+
     os.makedirs("Models", exist_ok=True)
     joblib.dump(model, "Models/knn.pkl")
     joblib.dump(scaler, "Models/knn_scaler.pkl")

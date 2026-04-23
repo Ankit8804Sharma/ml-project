@@ -8,9 +8,9 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.linear_model import LogisticRegression
 
 
-# -----------------------------
+
 # ROC CURVE
-# -----------------------------
+
 def plot_roc_curve(df):
 
     print("\n===== ROC CURVE =====\n")
@@ -55,9 +55,9 @@ def plot_roc_curve(df):
     plt.show()
 
 
-# -----------------------------
+
 # MAIN EDA
-# -----------------------------
+
 def run_eda():
 
     print("\n===== STARTING EDA =====\n")
@@ -76,9 +76,9 @@ def run_eda():
     print("\n===== STATISTICAL SUMMARY =====")
     print(df.describe())
 
-    # -----------------------------
+    
     # LABEL DISTRIBUTION
-    # -----------------------------
+    
     print("\n===== LABEL DISTRIBUTION =====")
     print(df["FraudFlag"].value_counts())
 
@@ -89,9 +89,9 @@ def run_eda():
     plt.ylabel("Count")
     plt.show()
 
-    # -----------------------------
+    
     # FEATURE DISTRIBUTIONS
-    # -----------------------------
+    
     features = [
         "Value_z",
         "GasCost_z",
@@ -108,26 +108,26 @@ def run_eda():
         plt.ylabel("Frequency")
         plt.show()
 
-    # -----------------------------
+    
     # CORRELATION HEATMAP
-    # -----------------------------
+    
     plt.figure(figsize=(8, 6))
     sns.heatmap(df[features].corr(), annot=True, cmap="coolwarm")
     plt.title("Feature Correlation Heatmap")
     plt.show()
 
-    # -----------------------------
+    
     # FEATURE VS FRAUD
-    # -----------------------------
+    
     for col in features:
         plt.figure()
         sns.boxplot(x="FraudFlag", y=col, data=df)
         plt.title(f"{col} vs Fraud")
         plt.show()
 
-    # -----------------------------
+    
     # INSIGHTS
-    # -----------------------------
+    
     print("\n===== KEY INSIGHTS =====")
 
     print("\n1. Class Imbalance:")

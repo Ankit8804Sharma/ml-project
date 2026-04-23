@@ -19,9 +19,9 @@ def run_logistic():
 
     df = pd.read_csv("Data/new dataset/labeled_data.csv")
 
-    # -----------------------------
+
     # FEATURES (UPDATED)
-    # -----------------------------
+
     features = [
         "Value_z",
         "GasCost_z",
@@ -33,9 +33,9 @@ def run_logistic():
     X = df[features].fillna(0)
     y = df["FraudFlag"]
 
-    # -----------------------------
+
     # TRAIN-TEST SPLIT
-    # -----------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -43,30 +43,30 @@ def run_logistic():
         stratify=y
     )
 
-    # -----------------------------
+
     # SCALING
-    # -----------------------------
+
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    # -----------------------------
+
     # SMOTE
-    # -----------------------------
+
     smote = SMOTE(random_state=42)
     X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    # -----------------------------
+
     # MODEL
-    # -----------------------------
+
     model = LogisticRegression(max_iter=1000, random_state=42)
     model.fit(X_train, y_train)
 
     preds = model.predict(X_test)
 
-    # -----------------------------
+
     # REPORT
-    # -----------------------------
+
     print("\n Accuracy:", accuracy_score(y_test, preds))
     print("\n Precision:", precision_score(y_test, preds))
     print(" Recall   :", recall_score(y_test, preds))
@@ -78,9 +78,9 @@ def run_logistic():
     print("\n Classification Report:")
     print(classification_report(y_test, preds))
 
-    # -----------------------------
+
     # SAVE MODEL
-    # -----------------------------
+
     os.makedirs("Models", exist_ok=True)
     joblib.dump(model, "Models/logistic.pkl")
     joblib.dump(scaler, "Models/logistic_scaler.pkl")
